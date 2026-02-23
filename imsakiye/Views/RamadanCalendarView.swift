@@ -2,7 +2,7 @@
 //  RamadanCalendarView.swift
 //  imsakiye
 //
-//  Sadece Ramazan ayını gösteren takvim; bugünün günü ve bitişe kalan gün.
+//  Miladi takvim (güncel ay) + Ramazan bilgisi; bugün vurgulu.
 //
 
 import SwiftUI
@@ -13,6 +13,32 @@ struct RamadanCalendarView: View {
     private let islamic = Calendar(identifier: .islamicUmmAlQura)
     private let gregorian = Calendar.current
 
+    // MARK: - Miladi (Gregoryen) takvim – gösterilen ay
+    private var currentMonthStart: Date? {
+        gregorian.date(from: gregorian.dateComponents([.year, .month], from: Date()))
+    }
+
+    private var currentMonthDayCount: Int {
+        guard let start = currentMonthStart else { return 31 }
+        guard let range = gregorian.range(of: .day, in: .month, for: start) else { return 31 }
+        return range.count
+    }
+
+    /// Bugünün miladi ay içindeki gün numarası (1–31)
+    private var todayGregorianDay: Int? {
+        let today = Date()
+        guard gregorian.isDate(today, equalTo: currentMonthStart ?? today, toGranularity: .month) else { return nil }
+        return gregorian.component(.day, from: today)
+    }
+
+    private var currentMonthTitle: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: currentMonthStart ?? Date())
+    }
+
+    // MARK: - Ramazan bilgisi (üst kartlar için)
     private var ramadanYear: Int {
         let comp = islamic.dateComponents([.year, .month], from: Date())
         let year = comp.year ?? 1446
@@ -34,7 +60,6 @@ struct RamadanCalendarView: View {
         return range.count
     }
 
-    /// Bugün Ramazan içinde mi? (Bu takvimde gösterdiğimiz Ramazan)
     private var todayDayInRamadan: Int? {
         guard let start = ramadanStart else { return nil }
         let today = Date()
@@ -51,7 +76,7 @@ struct RamadanCalendarView: View {
 
     private var weekdays: [String] {
         let symbols = gregorian.shortWeekdaySymbols
-        let first = Locale.current.calendar.firstWeekday - 1
+        let first = gregorian.firstWeekday - 1
         if first == 0 { return symbols }
         return (symbols[first...] + symbols[..<first]).map { String($0.prefix(2)) }
     }
@@ -76,12 +101,15 @@ struct RamadanCalendarView: View {
 
     private var headerCard: some View {
         VStack(spacing: 8) {
-            Image(systemName: "moon.stars.fill")
+            Image(systemName: "calendar")
                 .font(.system(size: 44))
                 .foregroundStyle(.white.opacity(0.95))
-            Text("Ramazan \(ramadanYear)")
+            Text(currentMonthTitle)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
+            Text("Miladi takvim")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.white.opacity(0.8))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
@@ -162,17 +190,18 @@ struct RamadanCalendarView: View {
 
             let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
             let firstWeekday: Int = {
-                guard let start = ramadanStart else { return 0 }
-                return gregorian.component(.weekday, from: start) - gregorian.firstWeekday
+                guard let start = currentMonthStart else { return 0 }
+                let w = gregorian.component(.weekday, from: start) - gregorian.firstWeekday
+                return (w + 7) % 7
             }()
-            let leadingBlanks = (firstWeekday + 7) % 7
+            let leadingBlanks = firstWeekday
 
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(0..<leadingBlanks, id: \.self) { _ in
                     Color.clear
                         .frame(height: 44)
                 }
-                ForEach(1...ramadanDayCount, id: \.self) { day in
+                ForEach(1...currentMonthDayCount, id: \.self) { day in
                     dayCell(day: day)
                 }
             }
@@ -189,7 +218,7 @@ struct RamadanCalendarView: View {
     }
 
     private func dayCell(day: Int) -> some View {
-        let isToday = todayDayInRamadan == day
+        let isToday = todayGregorianDay == day
         return Text("\(day)")
             .font(.system(.body, design: .rounded).weight(isToday ? .bold : .medium))
             .foregroundStyle(isToday ? .black : .white.opacity(0.95))
