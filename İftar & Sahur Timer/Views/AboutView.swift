@@ -25,7 +25,7 @@ struct AboutView: View {
                     .foregroundStyle(.secondary)
                     .padding(.top, 40)
                 
-                Text("İftar & Sahur Timer")
+                Text("İmsakiye")
                     .font(.title.weight(.bold))
                 
                 Text("Versiyon \(appVersion) (\(buildNumber))")

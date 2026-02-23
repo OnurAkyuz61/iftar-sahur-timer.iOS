@@ -147,29 +147,30 @@ final class TimerViewModel: ObservableObject {
             celestialProgress = 0
             return
         }
+        let imsakTime = day.imsak
+        let aksamTime = day.maghrib
         
-        if day.isCountingDownToIftar(now: now) {
-            isCountingToIftar = true
-            countdownSeconds = day.secondsUntilIftar(now: now)
-            celestialProgress = day.dayProgress(now: now)
-        } else if day.isCountingDownToSahur(now: now) {
+        // 1. now < imsakTime → Hedef: Bugünün İmsak. Başlık: "Sahura Kalan Süre"
+        if now < imsakTime {
             isCountingToIftar = false
-            countdownSeconds = day.secondsUntilSahur(now: now)
-            celestialProgress = day.nightProgress(now: now)
-        } else {
-            // İmsak öncesi veya tam vakit anı: kısa geçiş
-            if now < day.imsak {
-                isCountingToIftar = true
-                countdownSeconds = day.maghrib.timeIntervalSince(now)
-                celestialProgress = 0
-            } else if now >= day.maghrib && day.nextImsak == nil {
-                isCountingToIftar = false
+            countdownSeconds = max(0, imsakTime.timeIntervalSince(now))
+            celestialProgress = day.nightProgressBeforeImsak(now: now)
+        }
+        // 2. imsakTime <= now < aksamTime → Hedef: Bugünün Akşam. Başlık: "İftara Kalan Süre"
+        else if now >= imsakTime && now < aksamTime {
+            isCountingToIftar = true
+            countdownSeconds = max(0, aksamTime.timeIntervalSince(now))
+            celestialProgress = day.dayProgress(now: now)
+        }
+        // 3. now >= aksamTime → Hedef: Yarının İmsak. Başlık: "Sahura Kalan Süre"
+        else {
+            isCountingToIftar = false
+            if let nextImsak = day.nextImsak {
+                countdownSeconds = max(0, nextImsak.timeIntervalSince(now))
+                celestialProgress = day.nightProgress(now: now)
+            } else {
                 countdownSeconds = 0
                 celestialProgress = 1
-            } else {
-                isCountingToIftar = false
-                countdownSeconds = day.nextImsak.map { max(0, $0.timeIntervalSince(now)) } ?? 0
-                celestialProgress = day.nightProgress(now: now)
             }
         }
     }
@@ -192,10 +193,11 @@ final class TimerViewModel: ObservableObject {
         prayerDay?.maghrib.prayerTimeString ?? "—:—"
     }
     
-    /// Gündüz mü (Güneş göstermek için)
+    /// Gündüz mü (Güneş göstermek için). İmsak–Akşam arası true.
     var isDaytime: Bool {
         guard let day = prayerDay else { return true }
-        return day.isCountingDownToIftar(now: Date())
+        let now = Date()
+        return now >= day.imsak && now < day.maghrib
     }
     
     deinit {

@@ -81,11 +81,27 @@ actor NetworkManager {
             }
         }
         
+        // Önceki günün Akşam'ı (gece yarısından imsaka progress için)
+        let previousDay = calendar.date(byAdding: .day, value: -1, to: date) ?? date
+        let prevDateString = String(format: "%02d-%02d-%04d",
+                                    calendar.component(.day, from: previousDay),
+                                    calendar.component(.month, from: previousDay),
+                                    calendar.component(.year, from: previousDay))
+        var previousMaghrib: Date?
+        if let prevURL = URL(string: "\(baseURL)/timings/\(prevDateString)?latitude=\(latitude)&longitude=\(longitude)") {
+            if let (prevData, _) = try? await session.data(from: prevURL),
+               let prevDecoded = try? JSONDecoder().decode(AladhanAPIResponse.self, from: prevData),
+               let prev = Self.parseTime(prevDecoded.data.timings.Maghrib, for: previousDay, timeZoneIdentifier: timezone) {
+                previousMaghrib = prev
+            }
+        }
+        
         return PrayerDay(
             date: calendar.startOfDay(for: date),
             imsak: imsak,
             maghrib: maghrib,
-            nextImsak: nextImsak
+            nextImsak: nextImsak,
+            previousMaghrib: previousMaghrib
         )
     }
     
