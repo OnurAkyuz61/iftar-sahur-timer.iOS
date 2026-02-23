@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import MapKit
 
 struct SettingsView: View {
     @ObservedObject var viewModel: TimerViewModel
@@ -17,7 +18,7 @@ struct SettingsView: View {
     @State private var isSearching: Bool = false
     @FocusState private var isSearchFocused: Bool
     
-    private let geocoder = CLGeocoder()
+    private let geocoder = CLGeocoder() // Used when iOS < 26
     
     var body: some View {
         NavigationStack {
@@ -122,10 +123,31 @@ struct SettingsView: View {
         isSearching = true
         searchResults = []
         
-        geocoder.geocodeAddressString(query) { placemarks, _ in
-            DispatchQueue.main.async {
-                isSearching = false
-                searchResults = placemarks ?? []
+        if #available(iOS 26.0, *) {
+            Task {
+                guard let request = MKGeocodingRequest(addressString: query) else {
+                    await MainActor.run { isSearching = false }
+                    return
+                }
+                do {
+                    let mapItems = try await request.mapItems
+                    await MainActor.run {
+                        searchResults = mapItems.map(\.placemark)
+                        isSearching = false
+                    }
+                } catch {
+                    await MainActor.run {
+                        searchResults = []
+                        isSearching = false
+                    }
+                }
+            }
+        } else {
+            geocoder.geocodeAddressString(query) { placemarks, _ in
+                DispatchQueue.main.async {
+                    isSearching = false
+                    searchResults = placemarks ?? []
+                }
             }
         }
     }

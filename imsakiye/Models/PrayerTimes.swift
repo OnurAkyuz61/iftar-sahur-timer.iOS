@@ -8,20 +8,21 @@
 import Foundation
 
 // MARK: - API Response (Aladhan)
+// Not MainActor-isolated so decoding can run in Task.detached from NetworkManager actor.
 
-struct AladhanAPIResponse: Decodable {
+struct AladhanAPIResponse: Decodable, Sendable {
     let code: Int
     let status: String
     let data: AladhanData
 }
 
-struct AladhanData: Decodable {
+struct AladhanData: Decodable, Sendable {
     let timings: AladhanTimings
     let date: AladhanDate
     let meta: AladhanMeta?
 }
 
-struct AladhanTimings: Decodable {
+struct AladhanTimings: Decodable, Sendable {
     /// Sahur bitişi (yeme içme sonu) — İmsak
     let Imsak: String
     /// Fecir / Şafak
@@ -40,28 +41,28 @@ struct AladhanTimings: Decodable {
     }
 }
 
-struct AladhanDate: Decodable {
+struct AladhanDate: Decodable, Sendable {
     let readable: String
     let timestamp: String?
     let hijri: AladhanHijri?
     let gregorian: AladhanGregorian?
 }
 
-struct AladhanHijri: Decodable {
+struct AladhanHijri: Decodable, Sendable {
     let date: String
     let month: AladhanMonth?
 }
 
-struct AladhanMonth: Decodable {
+struct AladhanMonth: Decodable, Sendable {
     let en: String?
     let ar: String?
 }
 
-struct AladhanGregorian: Decodable {
+struct AladhanGregorian: Decodable, Sendable {
     let date: String
 }
 
-struct AladhanMeta: Decodable {
+struct AladhanMeta: Decodable, Sendable {
     let latitude: Double
     let longitude: Double
     let timezone: String?

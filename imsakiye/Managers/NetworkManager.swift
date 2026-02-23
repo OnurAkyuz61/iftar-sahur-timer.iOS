@@ -53,7 +53,9 @@ actor NetworkManager {
         
         let decoded: AladhanAPIResponse
         do {
-            decoded = try JSONDecoder().decode(AladhanAPIResponse.self, from: data)
+            decoded = try await Task.detached(priority: .userInitiated) {
+                try JSONDecoder().decode(AladhanAPIResponse.self, from: data)
+            }.value
         } catch {
             throw NetworkError.decoding(error)
         }
@@ -75,7 +77,7 @@ actor NetworkManager {
         var nextImsak: Date?
         if let nextURL = URL(string: "\(baseURL)/timings/\(nextDateString)?latitude=\(latitude)&longitude=\(longitude)") {
             if let (nextData, _) = try? await session.data(from: nextURL),
-               let nextDecoded = try? JSONDecoder().decode(AladhanAPIResponse.self, from: nextData),
+               let nextDecoded = try? await Task.detached(priority: .userInitiated) { try JSONDecoder().decode(AladhanAPIResponse.self, from: nextData) }.value,
                let next = Self.parseTime(nextDecoded.data.timings.Imsak, for: nextDay, timeZoneIdentifier: timezone) {
                 nextImsak = next
             }
@@ -90,7 +92,7 @@ actor NetworkManager {
         var previousMaghrib: Date?
         if let prevURL = URL(string: "\(baseURL)/timings/\(prevDateString)?latitude=\(latitude)&longitude=\(longitude)") {
             if let (prevData, _) = try? await session.data(from: prevURL),
-               let prevDecoded = try? JSONDecoder().decode(AladhanAPIResponse.self, from: prevData),
+               let prevDecoded = try? await Task.detached(priority: .userInitiated) { try JSONDecoder().decode(AladhanAPIResponse.self, from: prevData) }.value,
                let prev = Self.parseTime(prevDecoded.data.timings.Maghrib, for: previousDay, timeZoneIdentifier: timezone) {
                 previousMaghrib = prev
             }

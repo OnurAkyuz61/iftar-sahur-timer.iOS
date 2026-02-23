@@ -24,6 +24,11 @@ struct MainTabView: View {
                     Label("Ana Sayfa", systemImage: "house.fill")
                 }
             
+            RamadanCalendarView()
+                .tabItem {
+                    Label("Takvim", systemImage: "calendar")
+                }
+            
             SettingsView(viewModel: viewModel, locationManager: locationManager)
                 .tabItem {
                     Label("Ayarlar", systemImage: "gearshape.fill")

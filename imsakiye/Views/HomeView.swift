@@ -41,9 +41,11 @@ struct HomeView: View {
                     .padding(.bottom, 48)
             }
             
-            // Zarif toast uyarı (blur + ikon)
+            // Zarif toast uyarı (blur + ikon) + İstanbul ile devam et
             if let error = viewModel.errorMessage {
-                errorToast(message: error)
+                errorToast(message: error, onUseIstanbul: {
+                    viewModel.setManualPlace(name: "İstanbul", lat: 41.0082, lon: 28.9784)
+                })
             }
         }
         .onAppear {
@@ -106,17 +108,28 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
     }
     
-    private func errorToast(message: String) -> some View {
+    private func errorToast(message: String, onUseIstanbul: @escaping () -> Void) -> some View {
         VStack {
             Spacer()
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.yellow)
-                Text(message)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.primary)
-                Spacer(minLength: 8)
+            VStack(spacing: 14) {
+                HStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.yellow)
+                    Text(message)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.primary)
+                    Spacer(minLength: 8)
+                }
+                Button(action: onUseIstanbul) {
+                    Text("İstanbul ile devam et")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(.white.opacity(0.25), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)

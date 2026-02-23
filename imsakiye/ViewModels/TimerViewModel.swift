@@ -44,13 +44,16 @@ final class TimerViewModel: ObservableObject {
     }
     
     private func bindLocation() {
-        // Cihaz konumu değiştiğinde sadece useDeviceLocation true ise güncelle
+        // Cihaz konumu değiştiğinde güncelle; konum gelirse vakitleri yeniden çek
         locationManager.$placemark
             .combineLatest($useDeviceLocation)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _, useDevice in
                 guard useDevice else { return }
                 self?.objectWillChange.send()
+                if self?.locationManager.hasValidLocation == true {
+                    self?.fetchPrayerTimesIfPossible()
+                }
             }
             .store(in: &cancellables)
         locationManager.$lastLocation
@@ -59,6 +62,9 @@ final class TimerViewModel: ObservableObject {
             .sink { [weak self] _, useDevice in
                 guard useDevice else { return }
                 self?.objectWillChange.send()
+                if self?.locationManager.hasValidLocation == true {
+                    self?.fetchPrayerTimesIfPossible()
+                }
             }
             .store(in: &cancellables)
     }

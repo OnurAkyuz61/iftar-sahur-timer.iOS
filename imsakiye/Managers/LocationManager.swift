@@ -8,6 +8,7 @@
 import Foundation
 import CoreLocation
 import Combine
+import MapKit
 
 @MainActor
 final class LocationManager: NSObject, ObservableObject {
@@ -49,14 +50,26 @@ final class LocationManager: NSObject, ObservableObject {
     /// Konum bilgisinden şehir/ilçe adını alır (ters coğrafi kodlama).
     func updatePlacemark() async {
         guard let location = lastLocation else { return }
-        let geocoder = CLGeocoder()
-        do {
-            let placemarks = try await geocoder.reverseGeocodeLocation(location)
-            await MainActor.run {
-                self.placemark = placemarks.first
+        if #available(iOS 26.0, *) {
+            guard let request = MKReverseGeocodingRequest(location: location) else { return }
+            do {
+                let mapItems = try await request.mapItems
+                await MainActor.run {
+                    self.placemark = mapItems.first?.placemark
+                }
+            } catch {
+                // Sessizce yoksay; şehir alanı boş kalır
             }
-        } catch {
-            // Sessizce yoksay; şehir alanı boş kalır
+        } else {
+            let geocoder = CLGeocoder()
+            do {
+                let placemarks = try await geocoder.reverseGeocodeLocation(location)
+                await MainActor.run {
+                    self.placemark = placemarks.first
+                }
+            } catch {
+                // Sessizce yoksay; şehir alanı boş kalır
+            }
         }
     }
     
