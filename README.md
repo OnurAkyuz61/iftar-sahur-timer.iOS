@@ -1,25 +1,27 @@
-# İftar & Sahur Timer
+# İmsakiye
 
-Ramazan ayında iftar ve sahur vakitlerini takip etmek için iOS uygulaması.
+Ramazan ayında iftar ve sahur vakitlerini takip etmek için iOS uygulaması. Konumunuza göre namaz vakitlerini gösterir, iftara veya sahura kalan süreyi geri sayım ile sunar.
 
 ## Özellikler
 
-- İftar ve sahur vakitlerini görüntüleme
-- SwiftUI ile modern arayüz
-- SwiftData ile yerel veri saklama
+- **İftara / Sahura kalan süre** — Anlık saate göre doğru hedef vakit (İmsak öncesi → Sahur, İmsak–Akşam → İftar, Akşam sonrası → Sahur)
+- **Konum bazlı vakitler** — Aladhan API ile enlem/boylama göre hesaplanan İmsak ve Akşam vakitleri
+- **Anlık konum veya şehir seçimi** — Cihaz konumu veya Ayarlar’dan manuel şehir
+- **Gündüz/gece arayüzü** — Güneş/Ay yayı ve gökyüzü arka planı ile vakit ilerlemesi
+- SwiftUI ile modern arayüz (MVVM)
 
 ## Gereksinimler
 
-- iOS 17.0+
-- Xcode 15.0+
+- iOS 26.0+
+- Xcode 26.0+
 - Swift 5.9+
 
 ## Kurulum
 
 1. Depoyu klonlayın:
    ```bash
-   git clone https://github.com/onurakyuz/iftar-sahur-timer.iOS.git
-   cd iftar-sahur-timer.iOS
+   git clone https://github.com/onurakyuz/imsakiye.iOS.git
+   cd imsakiye.iOS
    ```
 
 2. Xcode ile `İftar & Sahur Timer.xcodeproj` dosyasını açın.
@@ -29,11 +31,28 @@ Ramazan ayında iftar ve sahur vakitlerini takip etmek için iOS uygulaması.
 ## Proje Yapısı
 
 ```
-İftar & Sahur Timer/
+imsakiye.iOS/
 ├── İftar & Sahur Timer/
-│   ├── ContentView.swift      # Ana ekran
-│   ├── Item.swift             # Veri modeli
-│   └── I_ftar___Sahur_TimerApp.swift  # Uygulama giriş noktası
+│   ├── I_ftar___Sahur_TimerApp.swift   # Uygulama giriş noktası
+│   ├── ContentView.swift
+│   ├── ViewModels/
+│   │   └── TimerViewModel.swift        # Geri sayım ve vakit mantığı
+│   ├── Views/
+│   │   ├── MainTabView.swift
+│   │   ├── HomeView.swift
+│   │   ├── MainTimerView.swift
+│   │   ├── SettingsView.swift
+│   │   ├── AboutView.swift
+│   │   ├── SunMoonArcView.swift
+│   │   ├── GlassmorphicCardView.swift
+│   │   └── SkyBackgroundView.swift
+│   ├── Models/
+│   │   └── PrayerTimes.swift           # PrayerDay, Aladhan API modelleri
+│   ├── Managers/
+│   │   ├── NetworkManager.swift        # Aladhan API
+│   │   └── LocationManager.swift
+│   └── Utilities/
+│       └── Date+Prayer.swift
 └── İftar & Sahur Timer.xcodeproj
 ```
 
