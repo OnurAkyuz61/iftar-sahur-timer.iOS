@@ -1,22 +1,34 @@
+<div align="center">
+  <img src="imsakiye/Assets.xcassets/AppLogo.imageset/AppLogo-1024.png" width="120" alt="İmsakiye" />
+</div>
+
+<div align="center">
+
 # İmsakiye
 
-Ramazan ayında iftar ve sahur vakitlerini takip etmek için iOS uygulaması. Konumunuza göre namaz vakitlerini gösterir, iftara veya sahura kalan süreyi geri sayım ile sunar.
+**Ramazan'da iftar ve sahur vakitlerini takip etmek için iOS uygulaması.**
 
-## Özellikler
+Konumunuza göre namaz vakitleri hesaplanır; iftara veya sahura kalan süreyi anlık geri sayım ile gösterir.
+
+</div>
+
+---
+
+## ✨ Özellikler
 
 - **İftara / Sahura kalan süre** — Anlık saate göre doğru hedef vakit (İmsak öncesi → Sahur, İmsak–Akşam → İftar, Akşam sonrası → Sahur)
-- **Konum bazlı vakitler** — Aladhan API ile enlem/boylama göre hesaplanan İmsak ve Akşam vakitleri
-- **Anlık konum veya şehir seçimi** — Cihaz konumu veya Ayarlar’dan manuel şehir
+- **Konum bazlı vakitler** — [Aladhan API](https://aladhan.com/) ile enlem/boylam'a göre hesaplanan İmsak ve Akşam vakitleri
+- **Anlık konum veya şehir seçimi** — Cihaz konumu veya Ayarlar'dan manuel şehir
 - **Gündüz/gece arayüzü** — Güneş/Ay yayı ve gökyüzü arka planı ile vakit ilerlemesi
 - SwiftUI ile modern arayüz (MVVM)
 
-## Gereksinimler
+## 📋 Gereksinimler
 
 - iOS 26.0+
 - Xcode 26.0+
 - Swift 5.9+
 
-## Kurulum
+## 🚀 Kurulum
 
 1. Depoyu klonlayın:
    ```bash
@@ -26,17 +38,17 @@ Ramazan ayında iftar ve sahur vakitlerini takip etmek için iOS uygulaması. Ko
 
 2. Xcode ile `İftar & Sahur Timer.xcodeproj` dosyasını açın.
 
-3. Simülatör veya bağlı cihaz seçip projeyi derleyin ve çalıştırın (⌘R).
+3. Simülatör veya bağlı cihaz seçip projeyi derleyin ve çalıştırın (**⌘R**).
 
-## Proje Yapısı
+## 📁 Proje Yapısı
 
 ```
 imsakiye.iOS/
-├── İftar & Sahur Timer/
+├── imsakiye/
 │   ├── I_ftar___Sahur_TimerApp.swift   # Uygulama giriş noktası
 │   ├── ContentView.swift
 │   ├── ViewModels/
-│   │   └── TimerViewModel.swift        # Geri sayım ve vakit mantığı
+│   │   └── TimerViewModel.swift       # Geri sayım ve vakit mantığı
 │   ├── Views/
 │   │   ├── MainTabView.swift
 │   │   ├── HomeView.swift
@@ -47,23 +59,31 @@ imsakiye.iOS/
 │   │   ├── GlassmorphicCardView.swift
 │   │   └── SkyBackgroundView.swift
 │   ├── Models/
-│   │   └── PrayerTimes.swift           # PrayerDay, Aladhan API modelleri
+│   │   └── PrayerTimes.swift          # PrayerDay, Aladhan API modelleri
 │   ├── Managers/
-│   │   ├── NetworkManager.swift        # Aladhan API
+│   │   ├── NetworkManager.swift       # Aladhan API
 │   │   └── LocationManager.swift
 │   └── Utilities/
 │       └── Date+Prayer.swift
 └── İftar & Sahur Timer.xcodeproj
 ```
 
-## Lisans
+## 📄 Lisans
 
 Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
-## Katkıda Bulunma
+## 🤝 Katkıda Bulunma
 
 1. Bu depoyu fork edin
 2. Yeni bir dal oluşturun (`git checkout -b feature/yeni-ozellik`)
 3. Değişikliklerinizi commit edin (`git commit -m 'Yeni özellik eklendi'`)
 4. Dalı push edin (`git push origin feature/yeni-ozellik`)
 5. Pull Request açın
+
+---
+
+<div align="center">
+
+Geliştirici: [Onur Akyüz](https://onurakyuz.com)
+
+</div>
